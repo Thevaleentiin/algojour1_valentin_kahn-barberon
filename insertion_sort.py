@@ -6,20 +6,19 @@ def tri_insertion(data):
     comparison = 0
     iteration = 0
 
-    tabData = data.split(";")
-    # Parcour de 1 à la taille du tabData
-    for i in range(1, len(tabData)): 
+    tab_data = data.split(";")
+    for i in range(1, len(tab_data)):
         iteration = iteration + 1
-        k = tabData[i] 
+        k = tab_data[i]
         j = i-1
         comparison = comparison + 2
-        while j >= 0 and k < tabData[j] :
+        while j >= 0 and k < tab_data[j]:
             iteration = iteration + 1
-            tabData[j + 1] = tabData[j] 
+            tab_data[j + 1] = tab_data[j]
             j -= 1
-        tabData[j + 1] = k
+        tab_data[j + 1] = k
 
-    return tabData, comparison, iteration
+    return tab_data, comparison, iteration
 
 
 result = tri_insertion(sys.argv[1])
