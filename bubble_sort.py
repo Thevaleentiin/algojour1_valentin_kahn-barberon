@@ -1,21 +1,23 @@
 import sys
 import timeit
 
+
 def bubble_sort(data):
     comparison = 0
     iteration = 0
 
-    tabData = data.split(";")
-    l = len(tabData)
+    tab_data = data.split(";")
+    l = len(tab_data)
     for i in range(l):
-        iteration = iteration+1
-        for j in range(0, l-i-1):
-            comparison = comparison+1
-            iteration = iteration+1
-            if tabData[j] > tabData[j+1]:
-                tabData[j], tabData[j+1] = tabData[j+1], tabData[j]
+        iteration = iteration + 1
+        for j in range(0, l - i - 1):
+            iteration = iteration + 1
+            comparison = comparison + 1
+            if tab_data[j] > tab_data[j + 1]:
+                tab_data[j], tab_data[j + 1] = tab_data[j + 1], tab_data[j]
 
-    return tabData, comparison, iteration
+    return tab_data, comparison, iteration
+
 
 result = bubble_sort(sys.argv[1])
 

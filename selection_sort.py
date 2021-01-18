@@ -6,21 +6,21 @@ def selection_sort(data):
     comparison = 0
     iteration = 0
 
-    tabData = data.split(";")
-    for i in range(len(tabData)):
+    tab_data = data.split(";")
+    for i in range(len(tab_data)):
         iteration = iteration + 1
-        minimumIndex = i
-        for j in range(i + 1, len(tabData)):
+        minimum_index = i
+        for j in range(i + 1, len(tab_data)):
             iteration = iteration + 1
             comparison = comparison + 1
-            if tabData[minimumIndex] > tabData[j]:
-                minimumIndex = j
+            if tab_data[minimum_index] > tab_data[j]:
+                minimum_index = j
 
-        storage = tabData[i]
-        tabData[i] = tabData[minimumIndex]
-        tabData[minimumIndex] = storage
+        storage = tab_data[i]
+        tab_data[i] = tab_data[minimum_index]
+        tab_data[minimum_index] = storage
 
-    return tabData, comparison, iteration
+    return tab_data, comparison, iteration
 
 
 result = selection_sort(sys.argv[1])
