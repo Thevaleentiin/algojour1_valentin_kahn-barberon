@@ -2,6 +2,8 @@ from datetime import datetime
 from hashlib import sha256
 import random
 import string
+import json
+import sys
 
 def calculateHash(block):
     bloc = str(block.index) + str(block.previous_hash) + str(block.timestamp) + str(block.data) + str(block.nonce)
@@ -11,17 +13,21 @@ class Block:
     def __init__(self, index, previous_hash, data, pow):
         self.index = index
         self.previous_hash = previous_hash
-        self.timestamp = datetime.now()
+        self.timestamp = str(datetime.now())
         self.data = data
         self.nonce = 0
         self.mine_hash()
 
     def mine_hash(self):
         test_hash = calculateHash(self)
-        while (test_hash[:pow] != "0" * pow):
+        while (test_hash[:int(pow)] != "0" * int(pow)):
             self.nonce = self.nonce + 1
             test_hash = calculateHash(self)
         self.self_hash = test_hash
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True, indent=4)
 
 
 class Blockchain:
@@ -59,20 +65,26 @@ class Blockchain:
             print("Nonce : " + str(block.nonce))
             print(" ")
 
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True, indent=4)
+
+fichier = open(sys.argv[1], "w+")
 
 pow = input("Entrez la taille de la preuve de travail : ")
 blockchain = Blockchain(pow)
 blockchain.add_block("Genesis block")
 blockchain.display()
-again = raw_input("Voulez vous ajouter un nouveau block ? (Y/n)")
+again = input("Voulez vous ajouter un nouveau block ? (Y/n)")
 if (again == "y" or again == ""):
-    data = raw_input("Entrez une data : ")
+    data = input("Entrez une data : ")
     while (data):
         blockchain.add_block(data)
+        fichier.write(blockchain.toJSON())
         blockchain.display()
-        again = raw_input("Voulez vous ajouter un nouveau block ? (Y/n)")
+        again = input("Voulez vous ajouter un nouveau block ? (Y/n)")
         if (again == "y" or again == ""):
-            data = raw_input("Entrez une data : ")
+            data = input("Entrez une data : ")
         else:
             break
 
