@@ -7,24 +7,21 @@ def calculateHash(block):
     bloc = str(block.index) + str(block.previous_hash) + str(block.timestamp) + str(block.data) + str(block.nonce)
     return(sha256(bloc.encode('utf-8')).hexdigest())
 
-pow_length = 3
-
 class Block:
-    def __init__(self, previous_hash, data):
-        self.index = 1
+    def __init__(self, index, previous_hash, data, pow):
+        self.index = index
         self.previous_hash = previous_hash
         self.timestamp = datetime.now()
         self.data = data
         self.nonce = 0
-        self.self_hash = self.mine_hash()
+        self.mine_hash()
 
     def mine_hash(self):
         test_hash = calculateHash(self)
-        while (test_hash[:pow_length] != "0" * pow_length):
+        while (test_hash[:pow] != "0" * pow):
             self.nonce = self.nonce + 1
             test_hash = calculateHash(self)
-        return test_hash
-
+        self.self_hash = test_hash
 
 
 class Blockchain:
@@ -34,25 +31,61 @@ class Blockchain:
         self.length = length
         self.current_previous_hash = None
 
-    def new_block(self, data):
-        block = Block(self.current_previous_hash, data)
+    def add_block(self, data):
+        block = Block(len(self.chain), self.current_previous_hash, data, pow)
         self.chain.append(block)
         self.current_previous_hash = block.self_hash
 
-blockchain_length = 4
+    def delete_block(self):
+        self.chain.pop()
 
-blockchain = Blockchain(None, blockchain_length)
-for i in range(0, blockchain.length):
-    lowercases = string.ascii_lowercase
-    block_data = ''.join(random.choice(lowercases) for i in range(20))
-    blockchain.new_block(block_data)
+    def security_check(self):
+        length = len(self.chain)
+        if (length == 1 and calculateHash(self.chain[0]) != self.chain[0].self_hash):
+            return False
+        for i in range(0, length - 1):
+            if (calculateHash(self.chain[i]) != self.chain[i].self_hash or self.chain[i].self_hash != self.chain[i + 1].previous_hash):
+                return False
+        return True
 
-for i in range(0, blockchain_length):
-    print("Block #" + str(i))
-    print("Index : " + str(blockchain.chain[i].index))
-    print("Previous hash : " + str(blockchain.chain[i].previous_hash))
-    print("Timestamp : " + str(blockchain.chain[i].timestamp))
-    print("Self hash : " + str(blockchain.chain[i].self_hash))
-    print("Data : " + str(blockchain.chain[i].data))
-    print("Nonce : " + str(blockchain.chain[i].nonce))
-    print(" ")
+    def display(self):
+        print("Blockchain validity : " + str(blockchain.security_check()))
+        for block in self.chain:
+            print(" ")
+            print("Block #" + str(block.index))
+            print("Previous hash : " + str(block.previous_hash))
+            print("Timestamp : " + str(block.timestamp))
+            print("Self hash : " + str(block.self_hash))
+            print("Data : " + str(block.data))
+            print("Nonce : " + str(block.nonce))
+            print(" ")
+
+
+max_length = 20
+pow = input("Entrez la taille de la preuve de travail : ")
+blockchain = Blockchain(pow, max_length)
+blockchain.add_block("Genesis block")
+max_length = max_length - 1
+blockchain.display()
+if blockchain.length > 1:
+    again = raw_input("Voulez vous ajouter un nouveau block ? (y/n)")
+    if (again == "y"):
+        data = raw_input("Entrez une data : ")
+        while (data):
+            blockchain.add_block(data)
+            max_length = max_length - 1
+            blockchain.display()
+            if (max_length > 0):
+                again = raw_input("Voulez vous ajouter un nouveau block ? (y/n)")
+                if (again == "y"):
+                    data = raw_input("Entrez une data : ")
+                else:
+                    break
+            else:
+                data = None
+                print("La taille maximale a ete atteinte")
+    else:
+        blockchain.display()
+else:
+    blockchain.display()
+    
