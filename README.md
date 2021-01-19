@@ -1,6 +1,6 @@
 # algojour1
 
-#TD10 - Jérémy Blahak - Valentin Khan - Hugo Pérard
+#TD10 - Jérémy Blahak - Valentin Kahn - Hugo Pérard
 
 ## General
 
