@@ -7,24 +7,23 @@ def shell_sort(data):
     iteration = 0
 
     tab_data = data.split(";")
-
-    n = len(tab_data)
-    gap = n/2
+    length = len(tab_data)
+    gap = length / 2
 
     comparison = comparison + 1
     while gap > 0:
         iteration = iteration + 1
-        for i in range(gap, n):
+        for i in range(int(gap), length):
             iteration = iteration + 1
             temp = tab_data[i]
             j = i
             comparison = comparison + 2
-            while j >= gap and tab_data[j-gap] > temp:
+            while j >= gap and float(tab_data[int(j - gap)]) > float(temp):
                 iteration = iteration + 1
-                tab_data[j] = tab_data[j-gap]
+                tab_data[int(j)] = tab_data[int(j - gap)]
                 j -= gap
                 comparison = comparison + 2
-            tab_data[j] = temp
+            tab_data[int(j)] = temp
         comparison = comparison + 1
         gap /= 2
 
