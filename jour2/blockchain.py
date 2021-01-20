@@ -2,14 +2,8 @@ from datetime import datetime
 from hashlib import sha256
 import random
 import string
-import json
+import jsonpickle
 import sys
-from collections import namedtuple
-
-
-def _json_object_hook(d): return namedtuple('X', d.keys())(*d.values())
-
-def json2obj(data): return json.loads(data, object_hook=_json_object_hook)
 
 def calculateHash(block):
     bloc = str(block.index) + str(block.previous_hash) + str(block.timestamp) + str(block.data) + str(block.nonce)
@@ -33,8 +27,7 @@ class Block:
         self.self_hash = test_hash
 
     def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4)
+        return jsonpickle.encode(self)
 
 
 class Blockchain:
@@ -77,23 +70,20 @@ class Blockchain:
             print(" ")
 
     def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4)
+        return jsonpickle.encode(self)
 
 def load_blockchain_from_file(file):
     json_content = file.read()
     if len(json_content) != 0:
-        blockchain_object = json2obj(json_content)
+        blockchain_object = jsonpickle.decode(json_content)
         blockchain = Blockchain(blockchain_object.pow)
         for block in blockchain_object.chain:
             blockchain.load_block(block)
         return blockchain
     return None
 
-
 file = open(sys.argv[1], "r")
 blockchain = load_blockchain_from_file(file)
-print(type(blockchain))
 file.close()
 file = open(sys.argv[1], "w")
 if (blockchain == None):
@@ -114,7 +104,6 @@ if (again == "y" or again == "Y" or again == ""):
         else:
             break
 
-print(type(blockchain))
 file.write(blockchain.toJSON())
 file.close()
 
