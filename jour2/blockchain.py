@@ -4,6 +4,12 @@ import random
 import string
 import json
 import sys
+from collections import namedtuple
+
+
+def _json_object_hook(d): return namedtuple('X', d.keys())(*d.values())
+
+def json2obj(data): return json.loads(data, object_hook=_json_object_hook)
 
 def calculateHash(block):
     bloc = str(block.index) + str(block.previous_hash) + str(block.timestamp) + str(block.data) + str(block.nonce)
@@ -16,11 +22,12 @@ class Block:
         self.timestamp = str(datetime.now())
         self.data = data
         self.nonce = 0
+        self.pow = pow
         self.mine_hash()
 
     def mine_hash(self):
         test_hash = calculateHash(self)
-        while (test_hash[:int(pow)] != "0" * int(pow)):
+        while (test_hash[:int(self.pow)] != "0" * int(self.pow)):
             self.nonce = self.nonce + 1
             test_hash = calculateHash(self)
         self.self_hash = test_hash
@@ -41,6 +48,10 @@ class Blockchain:
         self.chain.append(block)
         self.current_previous_hash = block.self_hash
 
+    def load_block(self, block):
+        self.chain.append(block)
+        self.current_previous_hash = block.self_hash
+
     def delete_block(self):
         self.chain.pop()
 
@@ -54,7 +65,7 @@ class Blockchain:
         return True
 
     def display(self):
-        print("Blockchain validity : " + str(blockchain.security_check()))
+        print("Blockchain validity : " + str(self.security_check()))
         for block in self.chain:
             print(" ")
             print("Block #" + str(block.index))
@@ -69,23 +80,42 @@ class Blockchain:
         return json.dumps(self, default=lambda o: o.__dict__, 
             sort_keys=True, indent=4)
 
-fichier = open(sys.argv[1], "w+")
+def load_blockchain_from_file(file):
+    json_content = file.read()
+    if len(json_content) != 0:
+        blockchain_object = json2obj(json_content)
+        blockchain = Blockchain(blockchain_object.pow)
+        for block in blockchain_object.chain:
+            blockchain.load_block(block)
+        return blockchain
+    return None
 
-pow = input("Entrez la taille de la preuve de travail : ")
-blockchain = Blockchain(pow)
-blockchain.add_block("Genesis block")
+
+file = open(sys.argv[1], "r")
+blockchain = load_blockchain_from_file(file)
+print(type(blockchain))
+file.close()
+file = open(sys.argv[1], "w")
+if (blockchain == None):
+    pow = input("Entrez la taille de la preuve de travail : ")
+    blockchain = Blockchain(pow)
+    blockchain.add_block("Genesis block")
 blockchain.display()
+
 again = input("Voulez vous ajouter un nouveau block ? (Y/n)")
-if (again == "y" or again == ""):
+if (again == "y" or again == "Y" or again == ""):
     data = input("Entrez une data : ")
     while (data):
         blockchain.add_block(data)
-        fichier.write(blockchain.toJSON())
         blockchain.display()
         again = input("Voulez vous ajouter un nouveau block ? (Y/n)")
-        if (again == "y" or again == ""):
+        if (again == "y" or again == "Y" or again == ""):
             data = input("Entrez une data : ")
         else:
             break
+
+print(type(blockchain))
+file.write(blockchain.toJSON())
+file.close()
 
     
