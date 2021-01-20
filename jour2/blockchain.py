@@ -26,6 +26,16 @@ class Block:
             test_hash = calculateHash(self)
         self.self_hash = test_hash
 
+    def display(self):
+        print(" ")
+        print("Block #" + str(self.index))
+        print("Previous hash : " + str(self.previous_hash))
+        print("Timestamp : " + str(self.timestamp))
+        print("Self hash : " + str(self.self_hash))
+        print("Data : " + str(self.data))
+        print("Nonce : " + str(self.nonce))
+        print(" ")
+
     def toJSON(self):
         return jsonpickle.encode(self)
 
@@ -35,6 +45,12 @@ class Blockchain:
         self.chain = []
         self.pow = pow
         self.current_previous_hash = None
+
+    def get_by_index(self, index):
+        if (int(index) >= len(self.chain)):
+            print("Aucun block ne correspond a cet index")
+            return None
+        return self.chain[int(index)]
 
     def add_block(self, data):
         block = Block(len(self.chain), self.current_previous_hash, data, self.pow)
@@ -56,18 +72,14 @@ class Blockchain:
             if (calculateHash(self.chain[i]) != self.chain[i].self_hash or self.chain[i].self_hash != self.chain[i + 1].previous_hash):
                 return False
         return True
+    
+    def validity_display(self):
+        print("Blockchain validity : " + str(self.security_check()))
 
     def display(self):
-        print("Blockchain validity : " + str(self.security_check()))
+        self.validity_display()
         for block in self.chain:
-            print(" ")
-            print("Block #" + str(block.index))
-            print("Previous hash : " + str(block.previous_hash))
-            print("Timestamp : " + str(block.timestamp))
-            print("Self hash : " + str(block.self_hash))
-            print("Data : " + str(block.data))
-            print("Nonce : " + str(block.nonce))
-            print(" ")
+            block.display()
 
     def toJSON(self):
         return jsonpickle.encode(self)
@@ -82,35 +94,43 @@ def load_blockchain_from_file(file):
         return blockchain
     return None
 
+try:
+    file = open(sys.argv[1], "r")
+    blockchain = load_blockchain_from_file(file)
+    file.close()
+except IOError:
+    print(sys.argv[1] + " created.")
+    blockchain = None
+finally:
+    file = open(sys.argv[1], "w")
+    if (blockchain == None):
+        pow = input("Entrez la taille de la preuve de travail : ")
+        blockchain = Blockchain(pow)
+        blockchain.add_block("Genesis block")
+    blockchain.display()
 
-file = open(sys.argv[1], "r")
-blockchain = load_blockchain_from_file(file)
-file.close()
-file = open(sys.argv[1], "w")
-if (blockchain == None):
-    pow = input("Entrez la taille de la preuve de travail : ")
-    blockchain = Blockchain(pow)
-    blockchain.add_block("Genesis block")
-blockchain.display()
+    while(True):
+        action = input("Que voulez vous faire ? (ADD/del/search/quit)")
+        if (action == "add" or action == "ADD" or action == ""):
+            data = input("Entrez la data de votre block : ")
+            blockchain.add_block(data)
+            blockchain.display()
+        elif (action == "del"):
+            blockchain.delete_block()
+            print("Le dernier block a été supprimé")
+            blockchain.display()
+        elif (action == "search"):
+            index = input("Quel est l'index du block recherché ? ")
+            searched_block = blockchain.get_by_index(index)
+            if (searched_block != None):
+                searched_block.display()
+        elif (action == "quit"):
+            blockchain.display()
+            break
+        else:
+            print("Commande incorrecte")
 
-while(True):
-    action = input("Que voulez vous faire ? (ADD/del/quit)")
-    print(action)
-    if (action == "add" or action == "ADD" or action == ""):
-        data = input("Entrez la data de votre block : ")
-        blockchain.add_block(data)
-        blockchain.display()
-    elif (action == "del"):
-        blockchain.delete_block()
-        print("Le dernier block a été supprimé")
-        blockchain.display()
-    elif (action == "quit"):
-        blockchain.display()
-        break
-    else:
-        print("Commande incorrecte")
+    file.write(blockchain.toJSON())
+    file.close()
 
-file.write(blockchain.toJSON())
-file.close()
-
-    
+        
