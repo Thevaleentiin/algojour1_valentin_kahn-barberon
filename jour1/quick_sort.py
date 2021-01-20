@@ -1,3 +1,5 @@
+import sys
+
 def partition(array, start, end):
     pivot = array[start]
     low = start + 1
@@ -17,15 +19,15 @@ def partition(array, start, end):
     array[start], array[high] = array[high], array[start]
     return high
 
-def quick_sort(array, start, end):
+def quick_sort(tab_data, start, end):
     if start >= end:
         return
 
-    p = partition(array, start, end)
-    quick_sort(array, start, p-1)
-    quick_sort(array, p+1, end)
+    p = partition(tab_data, start, end)
+    quick_sort(tab_data, start, p-1)
+    quick_sort(tab_data, p+1, end)
+    return tab_data
 
-array = [29,99,27,41,66,28,44,78,87,19,31,76,58,88,83,97,12,21,44]
-
-quick_sort(array, 0, len(array) - 1)
-print(array)
+data = sys.argv[1]
+tab_data = str(data).split(";")
+print(quick_sort(tab_data, 0, len(tab_data) - 1))
