@@ -82,6 +82,7 @@ def load_blockchain_from_file(file):
         return blockchain
     return None
 
+
 file = open(sys.argv[1], "r")
 blockchain = load_blockchain_from_file(file)
 file.close()
@@ -92,17 +93,22 @@ if (blockchain == None):
     blockchain.add_block("Genesis block")
 blockchain.display()
 
-again = input("Voulez vous ajouter un nouveau block ? (Y/n)")
-if (again == "y" or again == "Y" or again == ""):
-    data = input("Entrez une data : ")
-    while (data):
+while(True):
+    action = input("Que voulez vous faire ? (ADD/del/quit)")
+    print(action)
+    if (action == "add" or action == "ADD" or action == ""):
+        data = input("Entrez la data de votre block : ")
         blockchain.add_block(data)
         blockchain.display()
-        again = input("Voulez vous ajouter un nouveau block ? (Y/n)")
-        if (again == "y" or again == "Y" or again == ""):
-            data = input("Entrez une data : ")
-        else:
-            break
+    elif (action == "del"):
+        blockchain.delete_block()
+        print("Le dernier block a été supprimé")
+        blockchain.display()
+    elif (action == "quit"):
+        blockchain.display()
+        break
+    else:
+        print("Commande incorrecte")
 
 file.write(blockchain.toJSON())
 file.close()
