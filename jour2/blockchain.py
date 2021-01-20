@@ -82,35 +82,38 @@ def load_blockchain_from_file(file):
         return blockchain
     return None
 
+try:
+    file = open(sys.argv[1], "r")
+    blockchain = load_blockchain_from_file(file)
+    file.close()
+except IOError:
+    print(sys.argv[1] + " created.")
+    blockchain = None
+finally:
+    file = open(sys.argv[1], "w")
+    if (blockchain == None):
+        pow = input("Entrez la taille de la preuve de travail : ")
+        blockchain = Blockchain(pow)
+        blockchain.add_block("Genesis block")
+    blockchain.display()
 
-file = open(sys.argv[1], "r")
-blockchain = load_blockchain_from_file(file)
-file.close()
-file = open(sys.argv[1], "w")
-if (blockchain == None):
-    pow = input("Entrez la taille de la preuve de travail : ")
-    blockchain = Blockchain(pow)
-    blockchain.add_block("Genesis block")
-blockchain.display()
+    while(True):
+        action = input("Que voulez vous faire ? (ADD/del/quit)")
+        if (action == "add" or action == "ADD" or action == ""):
+            data = input("Entrez la data de votre block : ")
+            blockchain.add_block(data)
+            blockchain.display()
+        elif (action == "del"):
+            blockchain.delete_block()
+            print("Le dernier block a été supprimé")
+            blockchain.display()
+        elif (action == "quit"):
+            blockchain.display()
+            break
+        else:
+            print("Commande incorrecte")
 
-while(True):
-    action = input("Que voulez vous faire ? (ADD/del/quit)")
-    print(action)
-    if (action == "add" or action == "ADD" or action == ""):
-        data = input("Entrez la data de votre block : ")
-        blockchain.add_block(data)
-        blockchain.display()
-    elif (action == "del"):
-        blockchain.delete_block()
-        print("Le dernier block a été supprimé")
-        blockchain.display()
-    elif (action == "quit"):
-        blockchain.display()
-        break
-    else:
-        print("Commande incorrecte")
+    file.write(blockchain.toJSON())
+    file.close()
 
-file.write(blockchain.toJSON())
-file.close()
-
-    
+        
