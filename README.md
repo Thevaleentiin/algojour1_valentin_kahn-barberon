@@ -57,6 +57,17 @@ fonctionne de la manière suivante :
     
 ## Quick sort
 
+Le tri rapide est un algorythme de tri permettant de réorganiser des éléments
+(par exemple une liste) autour d'une clé dite pivot. Les éléments plus petit 
+que le pivot seront triés dans un ordre donné, et ceux plus grand égalements.
+On réaffectionne ensuite le pivot à une nouvelle valeur et on procède de nouveau
+par récursivité.
+
+Supposons que nous avons un vecteur allant de V(0) à V(n), et que le pivot ait
+pour indice V(j). Si les données testés sont plus petites que le pivot (V(j)) alors
+on les places dans le vecteur V(0) ... V(j). Si les données sont plus grandes, 
+on les places dans le vecteurs V(j+1) ... V(n). 
+
 
 ## Shell sort
 
